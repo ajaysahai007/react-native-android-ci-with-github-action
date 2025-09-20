@@ -1,0 +1,26 @@
+steps:
+  # 1. Checkout your repo (Cloud Build automatically fetches code)
+
+  # 2. Install Node dependencies
+  - name: node:18
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        yarn install --frozen-lockfile
+
+  # 3. Setup Java & Build APK
+  - name: openjdk:17
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug
+
+artifacts:
+  objects:
+    location: gs://YOUR_BUCKET_NAME/android-builds/
+    paths:
+      - android/app/build/outputs/apk/debug/app-debug.apk
