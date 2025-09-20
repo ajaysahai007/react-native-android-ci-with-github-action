@@ -1,6 +1,7 @@
-name: Android CI
+name: Android CI - Firebase Distribution
 
 on:
+  workflow_dispatch:          # Manual trigger (optional)
   push:
     branches: [ main ]
   pull_request:
@@ -32,13 +33,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK
+      - name: Build APK
         run: |
           cd android
-          ./gradlew assembleDebug
+          ./gradlew assembleRelease   # Use Release for Firebase Distribution
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
+
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase appdistribution:distribute android/app/build/outputs/apk/release/app-release.apk \
+            --app ${{ secrets.FIREBASE_APP_ID }} \
+            --groups "qa-testers" \
+            --release-notes "Automated build from GitHub Actions"
