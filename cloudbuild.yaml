@@ -1,5 +1,5 @@
 steps:
-  # 1. Install Node dependencies
+  # Install Node dependencies
   - name: node:18
     entrypoint: bash
     args:
@@ -7,12 +7,15 @@ steps:
       - |
         yarn install --frozen-lockfile
 
-  # 2. Setup Java & Build APK
-  - name: openjdk:17
+  # Build with Node + JDK together
+  - name: node:18
     entrypoint: bash
     args:
       - -c
       - |
+        apt-get update && apt-get install -y openjdk-17-jdk-headless
+        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        export PATH=$JAVA_HOME/bin:$PATH
         cd android
         chmod +x gradlew
         ./gradlew assembleDebug
