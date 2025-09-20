@@ -51,5 +51,5 @@ jobs:
         run: |
           firebase appdistribution:distribute android/app/build/outputs/apk/release/app-release.apk \
             --app ${{ secrets.FIREBASE_APP_ID }} \
-            --groups "qa-testers" \
+            --groups "testgroup" \
             --release-notes "Automated build from GitHub Actions"
